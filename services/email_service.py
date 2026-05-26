@@ -1,108 +1,42 @@
-import smtplib
+import os
+import resend
 
-from email.mime.multipart import (
-    MIMEMultipart
-)
+# A chave da API será puxada das variáveis do Railway
+resend.api_key = os.getenv("RESEND_API_KEY")
 
-from email.mime.text import MIMEText
-
-from email.mime.base import MIMEBase
-
-from email import encoders
-
-
-EMAIL = "flavintl4@gmail.com"
-PASSWORD = "njbd vkub csnr spee"
-
-
-def send_email(
-    to_email: str,
-    employee_name: str,
-    card_path: str
-):
-
-    print("1 - starting")
-
-    message = MIMEMultipart()
-
-    print("2 - message created")
-
-    message["From"] = EMAIL
-    message["To"] = to_email
-    message["Subject"] = (
-        "Feliz Aniversário"
-    )
-
-    body = f"""
-    Prezado(a) {employee_name},
-
-    Feliz aniversário.
-    """
-
-    message.attach(
-        MIMEText(body, "plain")
-    )
-
-    print("3 - body attached")
-
-    with open(card_path, "rb") as attachment:
-
-        print("4 - opening image")
-
-        part = MIMEBase(
-            "application",
-            "octet-stream"
-        )
-
-        part.set_payload(
-            attachment.read()
-        )
-
-    print("5 - image loaded")
-
-    encoders.encode_base64(part)
-
-    part.add_header(
-        "Content-Disposition",
-        f"attachment; filename={employee_name}.png"
-    )
-
-    message.attach(part)
-
-    print("6 - attachment added")
+def send_email(to_email: str, employee_name: str, card_path: str):
+    
+    print("1 - Iniciando envio via Resend")
 
     try:
+        # Lê o arquivo de imagem do cartão gerado
+        with open(card_path, "rb") as image_file:
+            image_data = image_file.read()
+            
+        print("2 - Imagem carregada com sucesso")
 
-        print("7 - connecting smtp")
+        # Monta a estrutura do e-mail
+        params = {
+            "from": "Sua Empresa <onboarding@resend.dev>", 
+            "to": [to_email],
+            "subject": "Feliz Aniversário! 🎉",
+            "html": f"<p>Prezado(a) <strong>{employee_name}</strong>,</p><p>Desejamos a você um excelente feliz aniversário!</p>",
+            "attachments": [
+                {
+                    "filename": f"{employee_name}.png",
+                    # O SDK do Resend exige que os bytes do arquivo sejam passados como uma lista
+                    "content": list(image_data) 
+                }
+            ]
+        }
 
-        server = smtplib.SMTP(
-            "smtp.gmail.com",
-            587,
-            timeout=10
-        )
-
-        print("8 - starttls")
-
-        server.starttls()
-
-        print("9 - login")
-
-        server.login(
-            EMAIL,
-            PASSWORD
-        )
-
-        print("10 - sending")
-
-        server.send_message(message)
-
-        print("11 - success")
-
-        server.quit()
+        print("3 - Enviando requisição para a API...")
+        
+        email_response = resend.Emails.send(params)
+        
+        print(f"4 - Sucesso! ID do E-mail: {email_response.get('id')}")
 
     except Exception as error:
-
-        print("EMAIL ERROR:")
+        print("ERRO NO ENVIO DE E-MAIL:")
         print(error)
-
         raise error
