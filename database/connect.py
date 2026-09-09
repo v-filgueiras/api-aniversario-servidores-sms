@@ -1,13 +1,24 @@
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Adicionado .rvfwutfabnfcgwhdylqo no usuario para autenticar no Supavisor
-DATABASE_URL = "postgresql://postgres.rvfwutfabnfcgwhdylqo:emeOw8aXIFB7tx79@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL nao definida. Configure a variavel de ambiente "
+        "com a string de conexao do Postgres (troque a senha antiga antes, "
+        "ela foi exposta no historico do git)."
+    )
 
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,  # Testa a conexão antes de usar para evitar desconexões
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
