@@ -17,7 +17,6 @@ def run_daily_birthdays():
 
     
 def start_scheduler():
-    # Garante o envio às 07:00 da manhã no horário local de Três Lagoas - MS
     scheduler.add_job(
         run_daily_birthdays,
         trigger="cron",
