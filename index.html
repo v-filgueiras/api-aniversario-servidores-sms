@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aniversário dos Servidores</title>
+  <link rel="stylesheet" href="/frontend/styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">🎂</div>
+      <div><strong>Aniversários</strong><span>Servidores</span></div>
+    </div>
+    <nav>
+      <button class="nav-item active" data-view="dashboard">⌂ <span>Dashboard</span></button>
+      <button class="nav-item" data-view="employees">👥 <span>Servidores</span></button>
+      <button class="nav-item" data-view="import">⇧ <span>Importar dados</span></button>
+      <button class="nav-item" data-view="birthdays">🎉 <span>Aniversariantes</span></button>
+      <button class="nav-item" data-view="history">↻ <span>Histórico</span></button>
+    </nav>
+    <div class="sidebar-footer"><span id="apiStatus" class="dot"></span> API</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Visão geral dos aniversários e envios.</p></div>
+      <button id="refreshButton" class="button secondary">Atualizar</button>
+    </header>
+
+    <section id="view-dashboard" class="view active">
+      <div class="cards" id="dashboardCards"></div>
+      <div class="panel">
+        <div class="panel-header"><div><h2>Aniversariantes de hoje</h2><p>Servidores ativos que fazem aniversário hoje.</p></div><button id="sendTodayButton" class="button primary">Enviar mensagens</button></div>
+        <div id="todayBirthdays"></div>
+      </div>
+    </section>
+
+    <section id="view-employees" class="view">
+      <div class="toolbar">
+        <input id="employeeSearch" class="input grow" placeholder="Buscar por nome ou e-mail" />
+        <select id="employeeActive" class="input"><option value="">Todos</option><option value="true">Ativos</option><option value="false">Inativos</option></select>
+        <button id="newEmployeeButton" class="button primary">+ Novo servidor</button>
+      </div>
+      <div class="panel"><div id="employeesTable"></div><div class="pagination" id="employeePagination"></div></div>
+    </section>
+
+    <section id="view-import" class="view">
+      <div class="panel import-panel">
+        <div class="panel-header"><div><h2>Importar servidores</h2><p>Envie CSV ou XLSX. Colunas aceitas: nome/full_name, email, data_nascimento/birth_date e ativo/active.</p></div></div>
+        <label id="dropZone" class="drop-zone">
+          <input id="importFile" type="file" accept=".csv,.xlsx" hidden />
+          <span class="drop-icon">⇧</span>
+          <strong>Arraste o arquivo aqui</strong>
+          <span>ou clique para selecionar</span>
+          <small>CSV ou XLSX</small>
+        </label>
+        <div id="importActions" class="import-actions hidden">
+          <div id="fileName"></div>
+          <button id="previewImportButton" class="button secondary">Analisar arquivo</button>
+        </div>
+        <div id="importPreview"></div>
+      </div>
+    </section>
+
+    <section id="view-birthdays" class="view">
+      <div class="toolbar"><select id="birthMonth" class="input"></select></div>
+      <div class="panel"><div id="birthdaysTable"></div></div>
+    </section>
+
+    <section id="view-history" class="view">
+      <div class="toolbar">
+        <select id="historyStatus" class="input"><option value="">Todos os status</option><option value="sent">Enviado</option><option value="dry_run">Simulação</option><option value="failed">Falhou</option></select>
+        <input id="historyDate" class="input" type="date" />
+        <button id="historyFilterButton" class="button secondary">Filtrar</button>
+      </div>
+      <div class="panel"><div id="historyTable"></div></div>
+    </section>
+  </main>
+
+  <dialog id="employeeDialog">
+    <form id="employeeForm" method="dialog">
+      <div class="dialog-header"><div><h2 id="dialogTitle">Novo servidor</h2><p>Cadastre ou edite os dados.</p></div><button type="button" id="closeDialog" class="icon-button">×</button></div>
+      <input id="employeeId" type="hidden" />
+      <label>Nome completo<input id="fullName" class="input" required minlength="2" /></label>
+      <label>E-mail<input id="email" class="input" type="email" required /></label>
+      <label>Data de nascimento<input id="birthDate" class="input" type="date" required /></label>
+      <label class="check"><input id="active" type="checkbox" checked /> Servidor ativo</label>
+      <div class="dialog-actions"><button type="button" id="cancelDialog" class="button secondary">Cancelar</button><button type="submit" class="button primary">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+  <script src="/frontend/app.js"></script>
+</body>
+</html>
